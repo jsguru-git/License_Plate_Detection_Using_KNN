@@ -3,7 +3,6 @@ Developed a License Plate Recognition system using Python &amp; OpenCV. It uses 
 
 > Some of the Samples Images are as follows:
 
-![alt text](https://github.com/AzharMithani/License-Plate-Detection/blob/master/1.jpg)
 
 ![alt text](https://github.com/AzharMithani/License-Plate-Detection/blob/master/2.jpg)
 
