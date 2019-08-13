@@ -1,0 +1,154 @@
+#!/bin/sh
+
+# This script moves required files from ~/page-dev to ~/page.  It also
+# creates the version file and updates the file WIN_INSTALL/page.iss
+# which is used by the Inno Setup Program to create the exe file in a
+# separate step.
+
+# It is necessary to set the bash variable V to the new version number.
+
+# This collects files from the current directory and put them in the
+# directory DEST.
+
+DEST=~/page
+
+V=4.18
+
+# Modify template.iss and rewrite page.iss
+echo "set vTcl(version) $V" > version
+
+sed -e "s:NV:$V:g" < WIN_INSTALL/template.iss > WIN_INSTALL/page.iss 
+
+# Remove all the files from within ~/page
+
+if [ ! -e $DEST ];
+then 
+	echo "mkdir $DEST"
+	mkdir $DEST
+fi
+
+rm -rf $DEST/*
+
+# Copy files to ~/page.
+
+FILES=" \
+         configure \
+         page \
+         page.tcl \
+         version \
+         release \
+         WRITE.BAT
+"
+
+DIRS=" \
+         docs \
+         examples \
+         images  \
+         lib \
+         page-icons \
+         examples-3 \
+         WIN_INSTALL "
+
+for file in $FILES
+do
+	if [ ! -e $DEST/$file ];
+	then 
+		echo "File: $file"
+		cp $file $DEST
+	fi	
+done
+
+for dir in $DIRS
+do
+	if [ ! -d $DEST/$dir ];
+	then
+		echo "Dir: $dir"
+		cp -dpr $dir $DEST
+    fi
+done
+
+# Remove files we do not wish to distribute.
+
+echo "\n*.save"
+find ~/page/ -name "*.save"
+
+find ~/page/ -name "*.save" -print0 | xargs -0 rm
+
+echo "\n*.save.*"
+find ~/page/ -name "*.save.*"
+
+find ~/page/ -name "*.save.*" -print0 | xargs -0 rm
+
+echo "\nRCS"
+find ~/page/ -name RCS
+
+find ~/page/ -name RCS -print0 | xargs -0 rm -rf
+
+echo "\n*.txt"
+find ~/page/ -name "*.txt" -print0 
+
+find ~/page/ -name "*.txt" -print0 | xargs -0 rm -rf
+
+echo "\n#*#"
+find ~/page/ -name "#*#" -print0 
+
+find ~/page/ -name "#*#" -print0 | xargs -0 rm -rf
+
+echo "\n*.orig"
+find ~/page/ -name "*.orig" -print0 
+
+find ~/page/ -name "*.orig" -print0 | xargs -0 rm -rf
+
+echo "\n*.new"
+find ~/page/ -name "*.new" -print0 
+
+find ~/page/ -name "*.new" -print0 | xargs -0 rm -rf
+
+echo "\n*.bak*"
+find ~/page/ -name "*.bak*"
+find ~/page/ -name "*.bak*" -print0 | xargs -0 rm -rf
+
+echo "\noutput.*"
+find ~/page/ -name "output.*" -print0 
+
+find ~/page/ -name "output.*" -print0 | xargs -0 rm -rf
+
+echo "*\nchanges"
+find ~/page/ -name "*changes" -print0 
+
+find ~/page/ -name "changes" -print0 | xargs -0 rm -rf
+
+echo "\ntt"
+find ~/page/ -name "tt" -print0 
+
+find ~/page/ -name "tt" -print0 | xargs -0 rm -rf
+
+echo "\nunknown*"
+find ~/page/ -name "unknown*" -print0 
+
+find ~/page/ -name "unknown*" -print0 | xargs -0 rm -rf
+
+find ~/page/ -name "" -print0 | xargs -0 rm -rf
+
+find ~/page/ -name "unknown*" -print0 | xargs -0 rm -rf
+
+find ~/page/ -name "*~" -print0 | xargs -0 rm -rf
+
+j
+echo "\nrm"
+
+rm ~/page/output.stuff
+
+echo run configure
+
+$DEST/configure
+
+# Build the tgz file for the release.
+
+echo "\ntar the files"
+cd ~
+echo "\nChanged to $PWD"
+
+tar zcvf ~/page-$V.tgz page 
+
+
